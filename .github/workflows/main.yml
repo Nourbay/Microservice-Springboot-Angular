@@ -29,7 +29,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
-      # --- Run unit tests and package ---
+      # --- Run tests and package JAR ---
       - name: Run Tests and Package JAR
         run: mvn clean verify
         working-directory: ./gestion-match
@@ -39,10 +39,12 @@ jobs:
 
       # --- SonarCloud analysis ---
       - name: SonarCloud analysis
-        run: mvn -B -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular \
-          -Dsonar.organization=nourbayoudh \
-          -Dsonar.host.url=https://sonarcloud.io \
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        run: |
+          mvn -B \
+            -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular \
+            -Dsonar.organization=nourbayoudh \
+            -Dsonar.host.url=https://sonarcloud.io \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
         working-directory: ./gestion-match
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -59,7 +61,7 @@ jobs:
       - name: Push Docker image to Nexus (latest)
         run: docker push bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
 
-      # --- Setup Docker Buildx and commit-based tag ---
+      # --- Setup Docker Buildx and tag with commit SHA ---
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
