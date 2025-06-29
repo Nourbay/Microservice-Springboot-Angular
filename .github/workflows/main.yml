@@ -40,7 +40,11 @@ jobs:
       # Docker Hub login and push
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        
+      
+      - name: Tag image for Docker Hub
+        run: |
+          docker tag 1870-196-234-9-161.ngrok-free.app/gestion-match:latest ${{ secrets.DOCKER_USERNAME }}/gestion-match:latest        
+     
       - name: Push images to Docker Hub
         run:
           docker push ${{ secrets.DOCKER_USERNAME }}/gestion-match:latest
