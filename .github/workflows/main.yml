@@ -34,6 +34,8 @@ jobs:
         run: ls -l ./gestion-match/target
 
       - name: Build and analyze
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular 
+        working-directory: ./gestion-match
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular
+       
