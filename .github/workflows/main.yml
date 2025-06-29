@@ -34,8 +34,17 @@ jobs:
         run: ls -l ./gestion-match/target
 
       - name: Build and analyze
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular 
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular
         working-directory: ./gestion-match
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-       
+
+      - name: 🐳 Log in to Docker (Nexus)
+        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login b9c2-165-51-178-95.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t b9c2-165-51-178-95.ngrok-free.app/repository/docker-hosted/pi-app:latest .
+        working-directory: ./pi
+
+      - name: Push Docker image to Nexus
+        run: docker push b9c2-165-51-178-95.ngrok-free.app/repository/docker-hosted/pi-app:latest
