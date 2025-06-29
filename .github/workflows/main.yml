@@ -43,8 +43,8 @@ jobs:
         run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 1870-196-234-9-161.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/pi-app:latest .
-        working-directory: ./pi
+        run: docker build -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
+        working-directory: ./gestion-match
 
       - name: Push Docker image to Nexus
-        run: docker push 1870-196-234-9-161.ngrok-free.app/repository/docker-back/pi-app:latest
+        run: docker push 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
