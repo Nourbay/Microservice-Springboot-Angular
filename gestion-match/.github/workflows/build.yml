@@ -1,0 +1,89 @@
+name: CI/CD with SonarCloud, Tests, Docker & Nexus
+
+on:
+  push:
+    branches:
+      - main
+      - Matchuser
+  pull_request:
+    branches:
+      - main
+      - Matchuser
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_URL: ${{ secrets.NEXUS_URL }}   # Exemple: e272-197-22-124-102.ngrok-free.app (sans https://)
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    steps:
+      # 1. Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Pour SonarQube
+
+      # 2. Setup JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      # 3. Cache SonarCloud packages
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      # 4. Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      # 5. Configure Maven settings.xml with Nexus credentials
+      - name: Configure Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>${NEXUS_USERNAME}</username>
+                <password>${NEXUS_PASSWORD}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      # 6. Build and run tests with coverage + SonarCloud analysis
+      - name: Build, Test & SonarCloud Analyze
+        run: mvn clean verify sonar:sonar \
+          -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular \
+          -Dsonar.organization=nourbayoudh \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ env.SONAR_TOKEN }}
+
+      # 7. Package JAR (skip tests car déjà fait)
+      - name: Package JAR
+        run: mvn package -DskipTests
+
+      # 8. Docker login to Nexus registry
+      - name: Docker login to Nexus
+        run: echo $NEXUS_PASSWORD | docker login $NEXUS_URL -u $NEXUS_USERNAME --password-stdin
+
+      # 9. Build Docker image
+      - name: Build Docker image
+        run: docker build -t $NEXUS_URL/repository/docker-hosted/microservice-backend:latest .
+
+      # 10. Push Docker image to Nexus
+      - name: Push Docker image to Nexus
+        run: docker push $NEXUS_URL/repository/docker-hosted/microservice-backend:latest
