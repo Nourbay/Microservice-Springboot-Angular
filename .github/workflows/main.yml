@@ -41,14 +41,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: 🐳 Log in to Docker (Nexus)
-        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login 1870-196-234-9-161.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
+        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login bd2d-196-234-9-161.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
+        run: docker build -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
         working-directory: ./gestion-match
 
       - name: Push Docker image to Nexus
-        run: docker push 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
+        run: docker push bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
 
 
       - name: Set up Docker Buildx
@@ -60,8 +60,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} \
-            -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest \
+            -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} \
+            -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest \
             .
         working-directory: ./gestion-match
 
@@ -71,8 +71,8 @@ jobs:
 
       - name: Tag image for Docker Hub
         run: |
-          docker tag 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} ${{ secrets.DOCKER_USERNAME }}/gestion-match:${IMAGE_TAG}
-          docker tag 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest ${{ secrets.DOCKER_USERNAME }}/gestion-match:latest
+          docker tag bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} ${{ secrets.DOCKER_USERNAME }}/gestion-match:${IMAGE_TAG}
+          docker tag bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest ${{ secrets.DOCKER_USERNAME }}/gestion-match:latest
 
       - name: Push images to Docker Hub
         run: |
