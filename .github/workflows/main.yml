@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # --- Checkout code ---
       - uses: actions/checkout@v4
 
+      # --- Setup JDK and Maven cache ---
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -20,44 +22,49 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # --- Cache SonarCloud packages ---
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
-      - name: Build JAR with Maven
-        run: mvn clean package -DskipTests
+      # --- Run tests and package JAR ---
+      - name: Run Tests and Package JAR
+        run: mvn clean verify
         working-directory: ./gestion-match
 
       - name: List target directory
         run: ls -l ./gestion-match/target
 
-
-      - name: Build and analyze
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular
+      # --- SonarCloud analysis ---
+      - name: SonarCloud analysis
+        run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=Nourbay_Microservice-Springboot-Angular
         working-directory: ./gestion-match
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: 🐳 Log in to Docker (Nexus)
+      # --- Login to Nexus Docker Registry ---
+      - name: 🐳 Login to Nexus Docker Registry
         run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login bd2d-196-234-9-161.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
-      - name: Build Docker image
+      # --- Build and push Docker image to Nexus ---
+      - name: Build Docker image for Nexus (latest)
         run: docker build -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
         working-directory: ./gestion-match
 
-      - name: Push Docker image to Nexus
+      - name: Push Docker image to Nexus (latest)
         run: docker push bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
 
-
+      # --- Setup Docker Buildx and tag with commit SHA ---
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Define Docker image tag
         run: echo IMAGE_TAG=${GITHUB_SHA} >> $GITHUB_ENV
 
-      - name: Build Docker image
+      - name: Build Docker image with tags (commit SHA + latest)
         run: |
           docker build \
             -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} \
@@ -65,11 +72,11 @@ jobs:
             .
         working-directory: ./gestion-match
 
-      # Docker Hub login and push
+      # --- Login and push images to Docker Hub ---
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      - name: Tag image for Docker Hub
+      - name: Tag Docker images for Docker Hub
         run: |
           docker tag bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:${IMAGE_TAG} ${{ secrets.DOCKER_USERNAME }}/gestion-match:${IMAGE_TAG}
           docker tag bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest ${{ secrets.DOCKER_USERNAME }}/gestion-match:latest
