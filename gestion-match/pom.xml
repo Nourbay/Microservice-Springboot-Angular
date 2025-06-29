@@ -22,7 +22,6 @@
 		<sonar.organization>nourbayoudh</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.projectKey>Nourbay_Microservice-Springboot-Angular</sonar.projectKey>
-
 	</properties>
 
 	<dependencyManagement>
@@ -53,7 +52,6 @@
 			<url>http://localhost:8081/repository/maven-releases/</url>
 		</repository>
 	</distributionManagement>
-
 
 	<dependencies>
 		<!-- Spring Boot Starters -->
@@ -188,6 +186,29 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- JaCoCo plugin for coverage -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.11</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>
