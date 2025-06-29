@@ -33,7 +33,9 @@ jobs:
       - name: List target directory
         run: ls -l ./gestion-match/target
 
-
+      - name: Build Docker image
+        run: docker build -t 1870-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
+        working-directory: ./gestion-match
         
       # Docker Hub login and push
       - name: Log in to Docker Hub
