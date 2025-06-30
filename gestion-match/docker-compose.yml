@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  eureka:
+    image: ton-image-eureka
+    container_name: eureka
+    ports:
+      - "8761:8761"
+
+  app:
+    image: nourbayoudh/gestion-match:latest
+    container_name: gestion-match
+    ports:
+      - "7071:7071"
+    environment:
+      - spring.data.mongodb.uri=mongodb://mongo:27017/pi2025
+      - eureka.client.serviceUrl.defaultZone=http://eureka:8761/eureka/
+    depends_on:
+      - mongo
+      - eureka
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
