@@ -81,13 +81,13 @@ jobs:
         run: ls -l target
 
       - name: 🐳 Login to Nexus Docker Registry
-        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login bd2d-196-234-9-161.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
+        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login ec1f-2c0f-f698-40c5-49b2-795c-f84c-dcdb-f7a4.ngrok-free.app --username ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest .
+        run: docker build -t ec1f-2c0f-f698-40c5-49b2-795c-f84c-dcdb-f7a4.ngrok-free.app/repository/docker-back/gestion-match:latest .
 
       - name: Push Docker image
-        run: docker push bd2d-196-234-9-161.ngrok-free.app/repository/docker-back/gestion-match:latest
+        run: docker push ec1f-2c0f-f698-40c5-49b2-795c-f84c-dcdb-f7a4.ngrok-free.app/repository/docker-back/gestion-match:latest
 
   docker-hub:
     runs-on: ubuntu-latest
